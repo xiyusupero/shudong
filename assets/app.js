@@ -12,6 +12,16 @@
   var byId = {};
   POSTS.forEach(function (p) { byId[p.id] = p; });
 
+  function shuffled(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  // 每次打开随机挑 24 条做首页；其余仍按编号倒序，筛选/搜索/答疑不受影响
+  var FEATURED = shuffled(POSTS.slice()).slice(0, 24).map(function (p) { return p.id; });
+
   var TOPICS = ['全部'].concat(META.topics || []);
   if (TOPICS.indexOf('避雷') === -1) TOPICS.push('避雷');
   var TYPE_CLASS = { '提问': 'question', '倾诉': 'vent', '经验': 'exp', '避雷': 'warn' };
@@ -107,6 +117,16 @@
       }
       return true;
     });
+
+    var isHome = state.view === 'posts' && state.topic === '全部' && !q;
+    if (isHome) {
+      var head = FEATURED.map(function (id) { return byId[id]; }).filter(Boolean);
+      var seen = {};
+      head.forEach(function (p) { seen[p.id] = true; });
+      var tail = list.filter(function (p) { return !seen[p.id]; })
+        .sort(function (a, b) { return b.no - a.no; });
+      return head.concat(tail);
+    }
 
     if (state.view === 'qa') {
       list.sort(function (a, b) {
