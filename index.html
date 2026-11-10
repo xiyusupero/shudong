@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>西语树洞留言展示 | 西语SuperO</title>
+<meta name="description" content="西班牙语学习、考研、留学、外派、求职的留言展示。来自公众号「西语SuperO」的树洞栏目，按板块整理。">
+<meta name="theme-color" content="#F3F8FC">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%233579AE'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23FFFFFF' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body id="top">
+
+<a class="skip" href="#browse">跳到内容</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="西语SuperO 树洞留言展示">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="15" fill="#3579AE"/>
+        <circle cx="16" cy="16" r="6.8" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+        <path d="M21.5 8.2c2.4-2.2 5.4-2.4 6.9-1.5-.7 3.1-3.1 5.3-6.2 5.3" fill="#7FB3C8"/>
+      </svg>
+      <span class="brand-text">
+        <strong>西语SuperO</strong>
+        <em>树洞留言展示</em>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="主导航">
+      <button class="nav-link is-active" data-view="posts">留言</button>
+      <button class="nav-link" data-about>关于</button>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn btn-small btn-primary" data-speak>我要投稿</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <p class="eyebrow"><span class="eyebrow-dot"></span>ESPAÑOL · 西语SuperO</p>
+    <h1>西班牙语树洞<br><em>留言展示</em></h1>
+    <p class="welcome">欢迎来到西语树洞，一个可以放心说话的地方。</p>
+    <p class="lede">
+      学习、考研、留学、外派、求职，生活里的开心和烦恼，都可以写。
+      下面按板块整理，点板块就能筛选；点卡片看全文和西语人留言。
+    </p>
+    <p class="source-line">内容来自公众号「西语SuperO」树洞栏目的文章与西语人留言。</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#browse">浏览留言 <span class="arrow">↓</span></a>
+      <button class="btn btn-ghost" data-speak>我要投稿</button>
+    </div>
+
+    <div class="how" aria-label="怎么回应">
+      <span class="how-title">怎么回应</span>
+      <span class="how-step"><b>1</b>找到想回应的留言</span>
+      <span class="how-arrow">→</span>
+      <span class="how-step"><b>2</b>点「回应这条」</span>
+      <span class="how-arrow">→</span>
+      <span class="how-step"><b>3</b>扫码填编号和答案</span>
+    </div>
+  </section>
+
+  <section class="browse wrap" id="browse">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">EL ARCHIVO</p>
+        <h2 id="browseTitle">翻一翻留言</h2>
+        <p class="board-note">来自公众号「西语SuperO」的网友留言，仅代表留言者个人观点，不代表平台意见。</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-top">
+        <label class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+          <input id="searchInput" type="search" placeholder="搜关键词或编号，比如「外派」「#159」" autocomplete="off">
+        </label>
+      </div>
+
+      <div class="toolbar-mid">
+        <div class="chips" id="topicChips" role="group" aria-label="板块筛选"></div>
+      </div>
+    </div>
+
+    <div class="qa-bar">
+      <button class="qa-link" id="qaLink" data-view="qa">点击这里，查看西语人的疑问+困惑，期待你的解答和建议~</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="empty" id="empty" hidden>
+      <div class="empty-mark">∅</div>
+      <p>没有找到这一条。换个关键词，或者重置筛选。</p>
+      <button class="btn btn-ghost" id="emptyReset">重置筛选</button>
+    </div>
+
+    <div class="load-wrap">
+      <button class="btn btn-ghost" id="loadMore">继续往下看</button>
+      <p class="load-note" id="loadNote"></p>
+    </div>
+  </section>
+
+  <section class="about-strip wrap">
+    <div class="about-card">
+      <div class="about-copy">
+        <p class="eyebrow">SOBRE ESTE HUECO</p>
+        <h2>西语树洞，<br>西语人的温馨角落</h2>
+        <p>欢迎来到西语树洞。这里是一个西语人可以放心说话的地方。</p>
+        <p>
+          不管你是在学西语、考研、留学、外派、找工作，还是想聊聊生活里的开心和烦恼，都可以投稿。
+        </p>
+        <p>
+          这些留言会整理发布到公众号「西语SuperO」的树洞栏目里，
+          欢迎关注公众号，看往期树洞内容、在公众号留言互动。
+        </p>
+        <p>
+          想回应某一条，或者想投稿，点「我要投稿」，按弹窗里的步骤扫码填写就好。
+        </p>
+        <div class="about-actions">
+          <button class="btn btn-primary" data-speak>我要投稿</button>
+          <button class="text-btn" data-about>了解更多 →</button>
+        </div>
+      </div>
+      <div class="about-side">
+        <div class="about-qr">
+          <img src="assets/qr-wechat.png" alt="公众号 西语SuperO 二维码">
+          <span>关注公众号「西语SuperO」</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-main">
+    <div class="footer-copy">
+      <div class="footer-brand">
+        <svg class="brand-mark small" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="15" fill="#3579AE"/>
+          <circle cx="16" cy="16" r="6.8" fill="none" stroke="#FFFFFF" stroke-width="2.8"/>
+        </svg>
+        西语SuperO · 树洞留言展示
+      </div>
+      <p>本页为公众号往期内容存档，不提供注册、发帖、评论功能。投稿请走问卷；看往期、留言请关注公众号「西语SuperO」。</p>
+      <p class="fine">
+        内容来自读者投稿；部分隐私内容已做化名处理。避雷内容仅为投稿人个人经历，仅供参考。
+        如需要删除，请私信「西语SuperO」下架内容。
+      </p>
+    </div>
+    <div class="footer-meta">
+      <p>公众号「西语SuperO」</p>
+
+    </div>
+  </div>
+</footer>
+
+<!-- 详情 -->
+<div class="modal" id="detailModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card detail-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <button class="modal-close" data-close aria-label="关闭">×</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- 我有话说 / 回应 -->
+<div class="modal" id="speakModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card speak-card" role="dialog" aria-modal="true" aria-labelledby="speakTitle">
+    <button class="modal-close" data-close aria-label="关闭">×</button>
+
+    <p class="eyebrow">CUÉNTAME</p>
+    <h2 id="speakTitle">我有话说</h2>
+    <p class="speak-context" id="speakContext">先找到你想回应的留言编号。</p>
+
+    <p class="speak-lead" id="speakLead">
+      长按识别二维码，在问卷里写上编号和你的答案即可。
+    </p>
+
+    <div class="speak-step">
+      <div class="step-head">
+        <span class="step-num">1</span>
+        <div>
+          <h3>打开问卷</h3>
+          <p>长按识别二维码；手机上也可以用相机扫。</p>
+        </div>
+      </div>
+      <div class="qr-row">
+        <img src="assets/qr-questionnaire.png" alt="问卷二维码" class="qr-big">
+        <div class="qr-actions">
+          <p class="qr-note">长按识别 / 扫码</p>
+          <p class="qr-help">手机长按识别；电脑上用手机扫。</p>
+          <a class="btn btn-primary" id="questionnaireLink" href="#" target="_blank" rel="noopener" hidden>打开问卷 ↗</a>
+          <p class="fine" id="linkNote">问卷链接待补充，先扫码填写。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="speak-step">
+      <div class="step-head">
+        <span class="step-num">2</span>
+        <div>
+          <h3>在问卷里写编号</h3>
+          <p id="step2Desc">在「想回应哪一条」里填这个编号：</p>
+        </div>
+      </div>
+      <div class="copy-box" id="copyBox">
+        <code id="speakCode">#____</code>
+        <button class="btn btn-small btn-ghost" id="copyNoBtn">复制编号</button>
+      </div>
+    </div>
+
+    <div class="speak-step">
+      <div class="step-head">
+        <span class="step-num">3</span>
+        <div>
+          <h3>写下你的答案，提交</h3>
+          <p>我会筛选，合适的会放到这条留言下面。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="speak-secondary">
+      <strong>不是投稿？</strong>
+      想沟通、删除、其他事情，去公众号「西语SuperO」私信。
+    </div>
+  </div>
+</div>
+
+<!-- 关于 -->
+<div class="modal" id="aboutModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card about-modal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <button class="modal-close" data-close aria-label="关闭">×</button>
+    <p class="eyebrow">SOBRE ESTE HUECO</p>
+    <h2 id="aboutTitle">西语树洞，西语人的温馨角落</h2>
+    <p>
+      欢迎来到西语树洞。这里存放的是公众号「西语SuperO」树洞栏目的文章和西语人留言。
+      学习、考研、留学、外派、求职，生活里的开心和烦恼，都可以写。
+    </p>
+    <p>
+      这些留言会整理发布到公众号的树洞栏目，也欢迎去公众号看往期、在公众号留言。
+    </p>
+
+    <h3>怎么回应</h3>
+    <ol>
+      <li>看到想回应的留言，点卡片上的「回应这条」。</li>
+      <li>长按二维码填写问卷；如果弹窗里有「打开问卷」按钮，也可以直接点。</li>
+      <li>在问卷里写「回应 #编号」，比如「回应 #159」，再写下你的答案。</li>
+      <li>筛选后，会把合适的答案放到那张卡片下面。</li>
+    </ol>
+
+    <h3>公众号用来做什么</h3>
+    <p>
+      看往期栏目、在公众号留言、日常沟通、内容更正、删除申请和其他事情，
+      都可以去公众号「西语SuperO」。<strong>公众号私信不是投稿入口</strong>，
+      投稿和回应请走问卷。
+    </p>
+
+    <h3>隐私</h3>
+    <p>
+      页面不收集数据，不展示个人信息。
+      留言仅代表投稿人个人经历。如果你是被提到的当事方，或希望删除自己的投稿，
+      请私信公众号「西语SuperO」下架内容。
+    </p>
+    <p class="fine">感谢每一位投稿的西语人。</p>
+  </div>
+</div>
+
+<script src="data/posts.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
