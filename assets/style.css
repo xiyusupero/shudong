@@ -133,9 +133,14 @@ a{color:inherit}
 .section-head h2{margin:0;font-family:var(--serif);font-size:clamp(28px,3.2vw,38px);line-height:1.15;letter-spacing:.01em}
 .section-note{max-width:28em;margin:0;color:var(--muted);font-size:13.5px;line-height:1.8;text-align:right}
 .board-note{margin:8px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted-2)}
-.qa-bar{margin:-8px 0 18px;padding:0 4px}
-.qa-link{border:0;background:transparent;color:var(--blue);font-size:12.5px;font-weight:600;line-height:1.7;text-align:left;cursor:pointer;padding:0}
-.qa-link:hover{color:var(--blue-deep);text-decoration:underline;text-underline-offset:3px}
+.qa-bar{margin:-6px 0 20px;display:flex}
+.qa-link{display:inline-flex;align-items:center;gap:8px;border:1px solid #CFE3F2;background:#EAF4FC;color:var(--blue-deep);font-size:13px;font-weight:600;line-height:1.6;text-align:left;cursor:pointer;padding:10px 16px;border-radius:10px;box-shadow:0 2px 8px rgba(31,95,138,.06);transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.qa-link:hover{background:#DFEEF9;border-color:#B9D7EA;transform:translateY(-1px)}
+.qa-link:active{transform:translateY(0)}
+.qa-emoji{font-size:16px;line-height:1}
+.qa-text{flex:1}
+.qa-line{display:inline}
+.qa-arrow{font-size:14px;color:var(--blue);margin-left:2px}
 .detail-disclaimer{margin:10px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted-2)}
 
 /* ---------- toolbar ---------- */
@@ -371,6 +376,9 @@ body.modal-open{overflow:hidden}
   /* 手机端筛选条不吸顶，滑下去就跟着页面走，避免占掉半屏 */
   .toolbar{position:static;top:auto;padding:10px 12px 8px}
   .header-actions{display:none}
+  .qa-bar{margin:-2px 0 16px}
+  .qa-link{width:100%;justify-content:flex-start;padding:11px 14px;font-size:12.5px}
+  .qa-line{display:block}
   .hero h1{font-size:clamp(34px,9vw,42px)}
   .lede{font-size:15px}
   .welcome{font-size:15.5px}

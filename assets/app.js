@@ -63,16 +63,25 @@
     });
     var qa = $('#qaLink');
     if (qa) {
+      var qaEmoji = qa.querySelector('.qa-emoji');
+      var qaArrow = qa.querySelector('.qa-arrow');
+      var qaLines = qa.querySelectorAll('.qa-line');
       if (state.view === 'qa') {
-        qa.textContent = '← 回到全部留言';
+        if (qaEmoji) qaEmoji.textContent = '←';
+        if (qaLines[0]) qaLines[0].textContent = '回到全部留言';
+        if (qaLines[1]) { qaLines[1].textContent = ''; qaLines[1].hidden = true; }
+        if (qaArrow) qaArrow.textContent = '';
         qa.setAttribute('data-view', 'posts');
       } else {
-        qa.textContent = '点击这里，查看西语人的疑问+困惑，期待你的解答和建议~';
+        if (qaEmoji) qaEmoji.textContent = '💬';
+        if (qaLines[0]) qaLines[0].textContent = '去【西语人的提问】专区看看，';
+        if (qaLines[1]) { qaLines[1].textContent = '期待你的解答和建议~'; qaLines[1].hidden = false; }
+        if (qaArrow) qaArrow.textContent = '→';
         qa.setAttribute('data-view', 'qa');
       }
     }
     var title = $('#browseTitle');
-    if (title) title.textContent = state.view === 'qa' ? '大家的提问' : '翻一翻留言';
+    if (title) title.textContent = state.view === 'qa' ? '西语人的提问' : '翻一翻留言';
     var bail = document.querySelector('[data-topic="避雷"]');
     if (bail) bail.hidden = state.view === 'qa';
   }
