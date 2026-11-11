@@ -101,8 +101,9 @@
     var isLatest = state.view === 'latest';
     var latestSection = $('#latest');
     if (latestSection) latestSection.hidden = isLatest;
-    var latestBack = $('#latestBack');
-    if (latestBack) latestBack.hidden = !isLatest;
+    var fab = $('#backHomeFab');
+    if (fab) fab.hidden = !isLatest;
+    document.body.classList.toggle('is-latest', isLatest);
     var title = $('#browseTitle');
     if (title) title.textContent = isLatest ? '最新投稿' : (state.view === 'qa' ? '西语人的提问' : '翻一翻留言');
     var bail = document.querySelector('[data-topic="避雷"]');
