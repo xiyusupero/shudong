@@ -206,7 +206,7 @@
     grid.innerHTML = LATEST.map(cardHTML).join('');
     markLong(grid);
     var note = $('#latestNote');
-    if (note) note.textContent = '最近收到的 ' + LATEST.length + ' 条投稿';
+    if (note) note.textContent = '最近更新的 ' + LATEST.length + ' 条';
   }
 
   function render() {
