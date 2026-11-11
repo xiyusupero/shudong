@@ -249,6 +249,34 @@
   </div>
 </div>
 
+<!-- 分享 -->
+<div class="modal" id="shareModal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-card share-card" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+    <button class="modal-close" data-close aria-label="关闭">×</button>
+    <p class="eyebrow">COMPARTIR</p>
+    <h2 id="shareTitle">分享这条留言</h2>
+    <p class="share-context" id="shareContext"></p>
+    <p class="share-lead" id="shareLead">复制链接发给朋友，对方打开就能直接看到这条。</p>
+
+    <div class="share-linkbox">
+      <input id="shareUrl" type="text" readonly aria-label="这条留言的链接">
+      <button class="btn btn-primary btn-small" id="shareCopy" type="button">复制链接</button>
+    </div>
+
+    <div class="share-wechat" id="shareWechat" hidden>
+      <span class="share-wechat-mark">微信</span>
+      <p>点右上角 <b>···</b>，选「发送给朋友」，对方打开就是这条留言。</p>
+    </div>
+
+    <div class="share-actions">
+      <button class="btn btn-ghost btn-small" id="shareNative" type="button" hidden>用系统分享…</button>
+    </div>
+
+    <p class="fine">链接里只有这条留言的编号，不包含你的微信或个人信息。</p>
+  </div>
+</div>
+
 <!-- 关于 -->
 <div class="modal" id="aboutModal" aria-hidden="true">
   <div class="modal-backdrop" data-close></div>

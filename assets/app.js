@@ -40,6 +40,7 @@
 
   var state = { view: 'posts', topic: '全部', q: '', limit: 24 };
   var PARAMS = new URLSearchParams(location.search);
+  var IS_WECHAT = /MicroMessenger/i.test(navigator.userAgent);
   if (PARAMS.get('limit')) state.limit = Math.max(1, parseInt(PARAMS.get('limit'), 10) || 24);
   if (PARAMS.get('view')) state.view = PARAMS.get('view');
   if (PARAMS.get('cols') === '2') document.body.classList.add('force-2col');
@@ -55,6 +56,29 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function pad(id) { return String(id).padStart(3, '0'); }
+
+  function cardUrl(id) {
+    var u = new URL(location.href);
+    u.hash = '';
+    u.search = '';
+    u.searchParams.set('id', id);
+    return u.toString();
+  }
+
+  /* 打开卡片时把 id 写进地址栏，微信右上角「···」分享出去的就是这张卡 */
+  function setUrlId(id) {
+    try {
+      var u = new URL(location.href);
+      if (id) u.searchParams.set('id', id);
+      else u.searchParams.delete('id');
+      history.replaceState(null, '', u);
+    } catch (e) {}
+  }
+
+  function excerpt(s, n) {
+    var t = cleanText(s).replace(/\n+/g, ' ');
+    return t.length > n ? t.slice(0, n) + '…' : t;
+  }
 
   function cleanText(s) {
     return String(s == null ? '' : s)
@@ -211,7 +235,10 @@
     html += '<div class="card-foot">';
     html += '<span class="answer-count' + (answers.length ? ' is-zero' : '') + '">' +
       (answers.length ? '' : '还没有留言') + '</span>';
+    html += '<span class="card-btns">';
+    html += '<button class="share-btn" data-share="' + p.id + '" aria-label="分享这条留言">分享</button>';
     html += '<button class="respond-btn" data-respond="' + p.id + '">回应这条</button>';
+    html += '</span>';
     html += '</div>';
     html += '</article>';
     return html;
@@ -285,6 +312,7 @@
 
     html += '<div class="detail-actions detail-actions-top">';
     html += '<button class="btn btn-primary btn-small" data-respond="' + p.id + '">回应这条</button>';
+    html += '<button class="btn btn-ghost btn-small" data-share="' + p.id + '">分享这条</button>';
     html += '<button class="btn btn-ghost btn-small" data-copy="' + p.id + '">复制编号</button>';
     if (p.articleUrl) {
       html += '<a class="btn btn-ghost btn-small" href="' + esc(p.articleUrl) + '" target="_blank" rel="noopener">公众号原文 ↗</a>';
@@ -305,11 +333,13 @@
 
     html += '<div class="detail-actions">';
     html += '<button class="btn btn-primary" data-respond="' + p.id + '">回应这条</button>';
+    html += '<button class="btn btn-ghost" data-share="' + p.id + '">分享这条</button>';
     html += '<button class="btn btn-ghost" data-copy="' + p.id + '">复制编号</button>';
     html += '</div>';
 
     $('#detailContent').innerHTML = html;
     openModal($('#detailModal'));
+    setUrlId(id);
   }
 
   function setQuestionnaireLink() {
@@ -328,6 +358,7 @@
 
   function openSpeak(id) {
     speakId = id || null;
+    setUrlId(null);
     var ctx = $('#speakContext');
     var lead = $('#speakLead');
     var code = $('#speakCode');
@@ -357,6 +388,38 @@
 
     setQuestionnaireLink();
     openModal($('#speakModal'));
+  }
+
+  /* ---------- 分享 ---------- */
+  var shareTarget = null;
+
+  function openShare(id) {
+    var p = byId[id];
+    if (!p) return;
+    shareTarget = id;
+    setUrlId(id);
+    $('#shareContext').textContent = '#' + pad(id) + ' · ' + p.topic + ' · ' + p.type;
+    $('#shareUrl').value = cardUrl(id);
+    $('#shareLead').textContent = IS_WECHAT
+      ? '在微信里打开时，点右上角菜单就能发给朋友；也可以复制链接。'
+      : '复制链接发给朋友，对方打开就能直接看到这条。';
+    $('#shareWechat').hidden = !IS_WECHAT;
+    $('#shareNative').hidden = !(navigator.share && !IS_WECHAT);
+    openModal($('#shareModal'));
+  }
+
+  function shareNative() {
+    if (!shareTarget || !navigator.share) return;
+    var p = byId[shareTarget];
+    if (!p) return;
+    navigator.share({
+      title: '西语树洞 #' + pad(shareTarget),
+      text: excerpt(p.text, 70),
+      url: cardUrl(shareTarget)
+    }).then(function () {
+      closeModal($('#shareModal'));
+      setUrlId(null);
+    }).catch(function () {});
   }
 
   function copyText(text, btn) {
@@ -454,6 +517,8 @@
           more.textContent = card.classList.contains('is-open') ? '收起 ↑' : '展开全文 ↓';
           return;
         }
+        var share = e.target.closest('[data-share]');
+        if (share) { openShare(share.getAttribute('data-share')); return; }
         var respond = e.target.closest('[data-respond]');
         if (respond) { openSpeak(respond.getAttribute('data-respond')); return; }
         var c = e.target.closest('.card');
@@ -472,6 +537,8 @@
     });
 
     $('#detailContent').addEventListener('click', function (e) {
+      var share = e.target.closest('[data-share]');
+      if (share) { openShare(share.getAttribute('data-share')); return; }
       var respond = e.target.closest('[data-respond]');
       if (respond) {
         var id = respond.getAttribute('data-respond');
@@ -490,15 +557,24 @@
       if (speakId) copyText('#' + pad(speakId), $('#copyNoBtn'));
     });
 
+    $('#shareCopy').addEventListener('click', function () {
+      copyText($('#shareUrl').value, this);
+    });
+    $('#shareNative').addEventListener('click', shareNative);
+
     $$('[data-about]').forEach(function (b) {
       b.addEventListener('click', function () { openModal($('#aboutModal')); });
     });
 
     $$('[data-close]').forEach(function (b) {
-      b.addEventListener('click', function () { closeModal(b.closest('.modal')); });
+      b.addEventListener('click', function () {
+        var m = b.closest('.modal');
+        closeModal(m);
+        if (m && (m.id === 'detailModal' || m.id === 'shareModal')) setUrlId(null);
+      });
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeAll();
+      if (e.key === 'Escape') { closeAll(); setUrlId(null); }
     });
   }
 
@@ -509,13 +585,18 @@
   renderLatest();
   render();
 
+  if (!PARAMS.get('demo') && PARAMS.get('id') && byId[PARAMS.get('id')]) {
+    openDetail(PARAMS.get('id'));
+  }
+
   if (PARAMS.get('scroll')) {
     setTimeout(function () { window.scrollTo(0, parseInt(PARAMS.get('scroll'), 10) || 0); }, 150);
   }
 
-  /* 预览用：?demo=detail|speak|about&id=159 */
+  /* 预览用：?demo=detail|speak|share|about&id=159 */
   var demo = PARAMS.get('demo');
   if (demo === 'detail') openDetail(PARAMS.get('id') || '159');
   if (demo === 'speak') openSpeak(PARAMS.get('id') || null);
+  if (demo === 'share') openShare(PARAMS.get('id') || '159');
   if (demo === 'about') openModal($('#aboutModal'));
 })();
