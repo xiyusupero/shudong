@@ -128,6 +128,7 @@ a{color:inherit}
 
 /* ---------- section head ---------- */
 .latest{padding-top:14px}
+.latest-actions{display:flex;justify-content:center;margin-top:18px}
 .browse{padding-top:14px}
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:32px 0 18px}
 .section-head .eyebrow{margin-bottom:8px}

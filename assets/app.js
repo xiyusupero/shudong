@@ -98,8 +98,13 @@
         qa.setAttribute('data-view', 'qa');
       }
     }
+    var isLatest = state.view === 'latest';
+    var latestSection = $('#latest');
+    if (latestSection) latestSection.hidden = isLatest;
+    var latestBack = $('#latestBack');
+    if (latestBack) latestBack.hidden = !isLatest;
     var title = $('#browseTitle');
-    if (title) title.textContent = state.view === 'qa' ? '西语人的提问' : '翻一翻留言';
+    if (title) title.textContent = isLatest ? '最新投稿' : (state.view === 'qa' ? '西语人的提问' : '翻一翻留言');
     var bail = document.querySelector('[data-topic="避雷"]');
     if (bail) bail.hidden = state.view === 'qa';
   }
@@ -108,6 +113,12 @@
     $('#topicChips').innerHTML = TOPICS.map(function (t) {
       return '<button class="chip' + (t === state.topic ? ' is-active' : '') + '" data-topic="' + esc(t) + '">' + esc(t) + '</button>';
     }).join('');
+  }
+
+  function byDate(a, b) {
+    var da = a.date || '', db = b.date || '';
+    if (da !== db) return db.localeCompare(da);
+    return b.no - a.no;
   }
 
   function filtered() {
@@ -134,6 +145,20 @@
       var tail = list.filter(function (p) { return !seen[p.id]; })
         .sort(function (a, b) { return b.no - a.no; });
       return head.concat(tail);
+    }
+
+    if (state.view === 'latest') {
+      var latestSet = {};
+      var head = [];
+      LATEST.forEach(function (p) {
+        latestSet[p.id] = true;
+        if (list.indexOf(p) !== -1) head.push(p);
+      });
+      var rest = list.filter(function (p) {
+        return p.source !== 'wechat' && !latestSet[p.id];
+      });
+      rest.sort(byDate);
+      return head.concat(rest);
     }
 
     if (state.view === 'qa') {
