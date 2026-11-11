@@ -127,6 +127,7 @@ a{color:inherit}
 .how-arrow{color:var(--muted-2);font-size:12px}
 
 /* ---------- section head ---------- */
+.latest{padding-top:14px}
 .browse{padding-top:14px}
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:32px 0 18px}
 .section-head .eyebrow{margin-bottom:8px}

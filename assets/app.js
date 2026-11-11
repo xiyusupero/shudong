@@ -12,6 +12,13 @@
   var byId = {};
   POSTS.forEach(function (p) { byId[p.id] = p; });
 
+  var LATEST = (META.latest || []).map(function (id) { return byId[id]; }).filter(Boolean);
+  if (!LATEST.length) {
+    LATEST = POSTS.filter(function (p) { return p.source !== 'wechat'; }).slice(0, 4);
+  }
+  var LATEST_SET = {};
+  LATEST.forEach(function (p) { LATEST_SET[p.id] = true; });
+
   function shuffled(a) {
     for (var i = a.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -19,8 +26,9 @@
     }
     return a;
   }
-  // 每次打开随机挑 24 条做首页；其余仍按编号倒序，筛选/搜索/答疑不受影响
-  var FEATURED = shuffled(POSTS.slice()).slice(0, 24).map(function (p) { return p.id; });
+  // 每次打开随机挑 24 条做首页；最新投稿固定在上方，不参与随机；其余仍按编号倒序
+  var FEATURED = shuffled(POSTS.filter(function (p) { return !LATEST_SET[p.id]; }))
+    .slice(0, 24).map(function (p) { return p.id; });
 
   var TOPICS = ['全部'].concat(META.topics || []);
   if (TOPICS.indexOf('避雷') === -1) TOPICS.push('避雷');
@@ -183,19 +191,31 @@
     return html;
   }
 
+  function markLong(root) {
+    $$('.card', root).forEach(function (card) {
+      var text = $('.card-text', card);
+      if (!text) return;
+      var long = text.scrollHeight > text.clientHeight + 4 || text.textContent.length > 230;
+      if (long) card.classList.add('is-long');
+    });
+  }
+
+  function renderLatest() {
+    var grid = $('#latestGrid');
+    if (!grid) return;
+    grid.innerHTML = LATEST.map(cardHTML).join('');
+    markLong(grid);
+    var note = $('#latestNote');
+    if (note) note.textContent = '最近收到的 ' + LATEST.length + ' 条投稿';
+  }
+
   function render() {
     var list = filtered();
     var shown = list.slice(0, state.limit);
     var grid = $('#grid');
 
     grid.innerHTML = shown.map(cardHTML).join('');
-
-    $$('.card', grid).forEach(function (card) {
-      var text = $('.card-text', card);
-      if (!text) return;
-      var long = text.scrollHeight > text.clientHeight + 4 || text.textContent.length > 230;
-      if (long) card.classList.add('is-long');
-    });
+    markLong(grid);
 
     $('#empty').hidden = list.length !== 0;
 
@@ -397,27 +417,32 @@
       render();
     });
 
-    var grid = $('#grid');
-    grid.addEventListener('click', function (e) {
-      var open = e.target.closest('[data-open]');
-      if (open) { openDetail(open.getAttribute('data-open')); return; }
-      var more = e.target.closest('[data-more]');
-      if (more) {
-        var card = more.closest('.card');
-        card.classList.toggle('is-open');
-        more.textContent = card.classList.contains('is-open') ? '收起 ↑' : '展开全文 ↓';
-        return;
-      }
-      var respond = e.target.closest('[data-respond]');
-      if (respond) { openSpeak(respond.getAttribute('data-respond')); return; }
-      var c = e.target.closest('.card');
-      if (c) openDetail(c.getAttribute('data-id'));
-    });
-    grid.addEventListener('keydown', function (e) {
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card')) {
-        e.preventDefault();
-        openDetail(e.target.getAttribute('data-id'));
-      }
+    function bindGrid(grid) {
+      grid.addEventListener('click', function (e) {
+        var open = e.target.closest('[data-open]');
+        if (open) { openDetail(open.getAttribute('data-open')); return; }
+        var more = e.target.closest('[data-more]');
+        if (more) {
+          var card = more.closest('.card');
+          card.classList.toggle('is-open');
+          more.textContent = card.classList.contains('is-open') ? '收起 ↑' : '展开全文 ↓';
+          return;
+        }
+        var respond = e.target.closest('[data-respond]');
+        if (respond) { openSpeak(respond.getAttribute('data-respond')); return; }
+        var c = e.target.closest('.card');
+        if (c) openDetail(c.getAttribute('data-id'));
+      });
+      grid.addEventListener('keydown', function (e) {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card')) {
+          e.preventDefault();
+          openDetail(e.target.getAttribute('data-id'));
+        }
+      });
+    }
+    ['#grid', '#latestGrid'].forEach(function (sel) {
+      var g = $(sel);
+      if (g) bindGrid(g);
     });
 
     $('#detailContent').addEventListener('click', function (e) {
@@ -455,6 +480,7 @@
   buildControls();
   syncView();
   bind();
+  renderLatest();
   render();
 
   if (PARAMS.get('scroll')) {
