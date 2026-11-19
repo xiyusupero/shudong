@@ -262,18 +262,18 @@
       <img id="shareImage" alt="留言分享图">
       <p class="share-error" id="shareError" hidden>图片生成失败，请用「复制链接」分享。</p>
     </div>
-    <p class="share-lead" id="shareLead">长按图片保存，发给朋友；对方扫码就能看到这条留言。</p>
+    <div class="share-actions">
+      <a class="btn btn-primary btn-small" id="shareDownload" download>保存图片</a>
+      <button class="btn btn-ghost btn-small" id="shareCopy" type="button">复制链接</button>
+      <button class="btn btn-ghost btn-small" id="shareNative" type="button" hidden>用系统分享…</button>
+    </div>
+
+    <p class="share-lead" id="shareLead">对方扫码就能看到这条留言。</p>
     <input id="shareUrl" type="hidden" aria-hidden="true">
 
     <div class="share-wechat" id="shareWechat" hidden>
       <span class="share-wechat-mark">微信</span>
-      <p>长按图片，选「保存图片」或「发送给朋友」；也可以点右上角 <b>···</b> 分享链接。</p>
-    </div>
-
-    <div class="share-actions">
-      <a class="btn btn-primary btn-small" id="shareDownload" download>保存图片</a>
-      <button class="btn btn-ghost btn-small" id="shareNative" type="button" hidden>用系统分享…</button>
-      <button class="btn btn-ghost btn-small" id="shareCopy" type="button">复制链接</button>
+      <p>长按图片保存或发送给朋友；也可以点右上角 <b>···</b> 分享链接。</p>
     </div>
 
     <p class="fine">图片和二维码里只有这条留言的编号，不包含你的微信或个人信息。</p>

@@ -552,6 +552,8 @@
     ctx.fillStyle = '#1E2A36';
     ctx.font = canvasFont(34, '700');
     ctx.fillText('西语SuperO', lx + 46, y + 2);
+    var brandW = ctx.measureText('西语SuperO').width;
+    drawPill(ctx, '西语树洞', lx + 46 + brandW + 14, y - 2, canvasFont(18, '700'), '#E7F2FA', '#255F8C', '#CFE3F2');
     ctx.fillStyle = '#6E8092';
     ctx.font = canvasFont(21, '400');
     ctx.fillText('树洞留言 · 西语人的温馨角落', lx + 46, y + 48);
@@ -646,8 +648,8 @@
       dl.hidden = true;
     }
     $('#shareLead').textContent = IS_WECHAT
-      ? '长按图片，选「保存图片」或「发送给朋友」；对方扫码就能看到这条。'
-      : '长按图片保存，或点「保存图片」；对方扫码就能看到这条。';
+      ? '对方扫码就能看到这条留言。'
+      : '保存图片发给朋友，对方扫码就能看到这条留言。';
     $('#shareWechat').hidden = !IS_WECHAT;
     $('#shareNative').hidden = !(navigator.share && !IS_WECHAT);
     openModal($('#shareModal'));

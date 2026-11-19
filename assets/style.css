@@ -358,18 +358,18 @@ body.is-latest .browse{padding-bottom:96px}
 /* ---------- share ---------- */
 .share-card{max-width:560px}
 .share-context{margin:0 0 6px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
-.share-preview{margin:12px 0 10px;padding:10px;background:linear-gradient(180deg,#F3F8FC 0%,#EAF4FB 100%);border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;min-height:110px}
+.share-preview{margin:12px 0 0;padding:10px;background:linear-gradient(180deg,#F3F8FC 0%,#EAF4FB 100%);border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;min-height:110px}
 .share-preview img{display:block;width:100%;max-width:420px;max-height:52vh;object-fit:contain;border-radius:10px;background:#fff;box-shadow:0 10px 30px -18px rgba(16,35,52,.45)}
 .share-preview img[hidden]{display:none}
 .share-error{margin:0;padding:22px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);text-align:center}
-.share-lead{margin:10px 0 0;font-size:12.8px;line-height:1.75;color:var(--ink-2)}
-.share-wechat{display:flex;align-items:flex-start;gap:9px;margin-top:12px;padding:12px 14px;background:#EAF7EE;border:1px solid #CDE8D6;border-radius:10px}
+.share-lead{margin:8px 0 0;font-size:12.8px;line-height:1.75;color:var(--ink-2)}
+.share-wechat{display:flex;align-items:flex-start;gap:9px;margin-top:8px;padding:12px 14px;background:#EAF7EE;border:1px solid #CDE8D6;border-radius:10px}
 .share-wechat-mark{flex:none;margin-top:1px;padding:2px 6px;border-radius:5px;background:#2FA35B;color:#fff;font-size:11px;font-weight:700;letter-spacing:.03em}
 .share-wechat p{margin:0;font-size:12.5px;line-height:1.75;color:#2C6B44}
 .share-wechat b{font-family:var(--mono);font-size:13px}
-.share-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.share-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .share-actions .btn[hidden]{display:none}
-.share-card .fine{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted-2)}
+.share-card .fine{margin:10px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted-2)}
 
 /* ---------- about modal ---------- */
 .about-modal{max-width:660px}
@@ -425,6 +425,19 @@ body.modal-open{overflow:hidden}
   .card{padding:18px 17px 14px}
 }
 @media (max-width:520px){
+  .share-card{padding:20px 16px 16px}
+  .share-card .eyebrow{display:none}
+  .share-card h2{font-size:21px;margin:0 0 4px}
+  .share-context{font-size:11px;margin:0 0 4px}
+  .share-preview{margin:8px 0 0;padding:6px;min-height:0;border-radius:12px}
+  .share-preview img{max-height:46vh;max-width:100%;border-radius:8px}
+  .share-actions{margin-top:8px;gap:6px}
+  .share-actions .btn{flex:1 1 0;padding:8px 8px;font-size:12px}
+  .share-actions #shareNative{flex-basis:100%}
+  .share-lead{font-size:11.5px;margin-top:7px;text-align:center}
+  .share-wechat{margin-top:8px;padding:8px 10px;gap:7px}
+  .share-wechat p{font-size:11.5px;line-height:1.6}
+  .share-card .fine{display:none}
   .detail-actions{gap:8px;margin-top:18px}
   .detail-actions .btn{padding:7px 10px;font-size:12px;gap:4px}
   .detail-actions-top{gap:6px}
