@@ -10,3 +10,5 @@
 避雷内容仅为投稿人个人经历，仅供参考。
 
 如需删除或更正，请私信公众号「西语SuperO」。
+
+分享图由前端 Canvas 生成，二维码使用 assets/qrcode.js（qrcode-generator，MIT）。
