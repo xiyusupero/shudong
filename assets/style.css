@@ -368,6 +368,8 @@ body.is-latest .browse{padding-bottom:96px}
 .share-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .share-actions .btn[hidden]{display:none}
 .share-card .fine{margin:10px 0 0;font-size:11.5px;line-height:1.7;color:var(--muted-2)}
+body .share-card.is-error .share-actions{display:flex}
+body .share-card.is-error .share-actions #shareCopy{display:inline-flex}
 
 /* ---------- about modal ---------- */
 .about-modal{max-width:660px}
@@ -431,9 +433,8 @@ body.modal-open{overflow:hidden}
   .share-preview img{max-height:46vh;max-width:100%;border-radius:8px}
   .share-actions{margin-top:8px;gap:6px}
   .share-actions .btn{flex:1 1 0;padding:8px 8px;font-size:12px}
-  body.is-wechat .share-actions{justify-content:center}
-  body.is-wechat .share-actions #shareCopy{flex:0 0 auto}
-  .share-actions #shareNative{flex-basis:100%}
+  .share-actions #shareCopy{display:none}
+  body.is-wechat .share-actions{display:none}
   .share-lead{font-size:11.5px;margin-top:7px;text-align:center}
   .share-longpress{font-size:13.5px;margin-top:7px}
   .share-card .fine{display:none}

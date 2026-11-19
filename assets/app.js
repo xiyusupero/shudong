@@ -637,6 +637,8 @@
     img.hidden = false;
     err.hidden = true;
     dl.hidden = true;
+    var shareCard = $('.share-card');
+    if (shareCard) shareCard.classList.remove('is-error');
     try {
       var canvas = renderShareCard(p);
       var dataUrl = canvas.toDataURL('image/png');
@@ -657,6 +659,7 @@
       img.removeAttribute('src');
       err.hidden = false;
       dl.hidden = true;
+      if (shareCard) shareCard.classList.add('is-error');
     }
     $('#shareLead').textContent = IS_WECHAT
       ? '也可以选「发送给朋友」直接转发；右上角 ··· 可分享链接。'
