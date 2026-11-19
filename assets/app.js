@@ -41,6 +41,7 @@
   var state = { view: 'posts', topic: '全部', q: '', limit: 24 };
   var PARAMS = new URLSearchParams(location.search);
   var IS_WECHAT = /MicroMessenger/i.test(navigator.userAgent);
+  if (IS_WECHAT) document.body.classList.add('is-wechat');
   if (PARAMS.get('limit')) state.limit = Math.max(1, parseInt(PARAMS.get('limit'), 10) || 24);
   if (PARAMS.get('view')) state.view = PARAMS.get('view');
   if (PARAMS.get('cols') === '2') document.body.classList.add('force-2col');
