@@ -392,17 +392,275 @@
 
   /* ---------- 分享 ---------- */
   var shareTarget = null;
+  var shareFile = null;
+  var shareFileName = '';
+  var TYPE_COLORS = {
+    '提问': ['#E7F2FA', '#255F8C'],
+    '倾诉': ['#E6F4F1', '#3F8C84'],
+    '经验': ['#ECEFF8', '#5A6FA8'],
+    '避雷': ['#FBEDE9', '#B85C4E']
+  };
+  var SHARE_FONT = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Apple Color Emoji",sans-serif';
+
+  function canvasFont(size, weight) {
+    return (weight || '400') + ' ' + size + 'px ' + SHARE_FONT;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var out = [];
+    String(text == null ? '' : text).split(/\n/).forEach(function (par) {
+      par = par.replace(/\s+$/, '');
+      if (!par.trim()) { out.push(''); return; }
+      var line = '';
+      var noStart = '，。；、！？：」』）】》,.!?;:)]}';
+      for (var i = 0; i < par.length; i++) {
+        var ch = par.charAt(i);
+        var test = line + ch;
+        if (line && ctx.measureText(test).width > maxWidth) {
+          if (noStart.indexOf(ch) !== -1) {
+            // 标点不单独跑到下一行开头
+            out.push(test);
+            line = '';
+            continue;
+          }
+          out.push(line);
+          line = ch;
+        } else {
+          line = test;
+        }
+      }
+      if (line) out.push(line);
+    });
+    while (out.length && !out[0]) out.shift();
+    while (out.length && !out[out.length - 1]) out.pop();
+    return out;
+  }
+
+  function drawPill(ctx, text, x, y, font, bg, fg, stroke) {
+    ctx.font = font;
+    var w = ctx.measureText(text).width + 36;
+    roundRect(ctx, x, y, w, 44, 10);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+    ctx.fillStyle = fg;
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x + 18, y + 23);
+    ctx.textBaseline = 'top';
+    return w;
+  }
+
+  function drawQr(ctx, text, x, y, size) {
+    var qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    var n = qr.getModuleCount();
+    var margin = 4;
+    var cell = size / (n + margin * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(x, y, size, size);
+    ctx.fillStyle = '#16222E';
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillRect(x + (c + margin) * cell, y + (r + margin) * cell, cell + 0.6, cell + 0.6);
+        }
+      }
+    }
+  }
+
+  function renderShareCard(p) {
+    var W = 1080;
+    var M = 40;
+    var PAD = 48;
+    var cardW = W - M * 2;
+    var innerX = M + PAD;
+    var innerW = cardW - PAD * 2;
+    var headerH = 104;
+    var metaH = 76;
+    var footerH = 220;
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('canvas unavailable');
+
+    /* 文字多时自动缩小字号，尽量一屏放下全文；实在放不下才截断 */
+    var configs = [{ size: 34, lineH: 54, max: 24 }, { size: 30, lineH: 46, max: 34 }];
+    var chosen = null;
+    var lines = null;
+    for (var ci = 0; ci < configs.length; ci++) {
+      ctx.font = canvasFont(configs[ci].size, '400');
+      var testLines = wrapCanvasText(ctx, p.text, innerW);
+      chosen = configs[ci];
+      lines = testLines;
+      if (testLines.length <= configs[ci].max) break;
+    }
+    var truncated = false;
+    if (lines.length > chosen.max) {
+      lines = lines.slice(0, chosen.max);
+      truncated = true;
+      lines[chosen.max - 1] = lines[chosen.max - 1].replace(/[\s，。；、,.;]*$/, '') + '……';
+    }
+    var bodyFont = canvasFont(chosen.size, '400');
+    var lineH = chosen.lineH;
+    var textH = lines.length * lineH;
+    var needH = M * 2 + PAD * 2 + headerH + metaH + textH + (truncated ? 30 : 0) + 80 + footerH;
+    var H = Math.max(820, needH);
+    var footerTop = H - M - PAD - footerH;
+    var dividerY = footerTop - 34;
+
+    canvas.width = W;
+    canvas.height = H;
+    ctx = canvas.getContext('2d');
+
+    var bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#F8FCFF');
+    bg.addColorStop(1, '#E8F3FB');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(23,55,82,.16)';
+    ctx.shadowBlur = 36;
+    ctx.shadowOffsetY = 16;
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, M, M, cardW, H - M * 2, 34);
+    ctx.fill();
+    ctx.restore();
+
+    var y = M + PAD;
+    var lx = innerX + 24;
+    var ly = y + 24;
+    ctx.fillStyle = '#3579AE';
+    ctx.beginPath();
+    ctx.arc(lx, ly, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 3.4;
+    ctx.beginPath();
+    ctx.arc(lx, ly, 10, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#1E2A36';
+    ctx.font = canvasFont(31, '700');
+    ctx.fillText('西语SuperO', lx + 42, y + 2);
+    ctx.fillStyle = '#6E8092';
+    ctx.font = canvasFont(20, '400');
+    ctx.fillText('树洞留言 · 西语人的温馨角落', lx + 42, y + 44);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#93A5B5';
+    ctx.font = canvasFont(18, '500');
+    ctx.fillText('ESPAÑOL · 树洞', innerX + innerW, y + 14);
+    ctx.textAlign = 'left';
+
+    y += headerH;
+    var tc = TYPE_COLORS[p.type] || TYPE_COLORS['倾诉'];
+    var w1 = drawPill(ctx, p.type, innerX, y, canvasFont(22, '700'), tc[0], tc[1]);
+    drawPill(ctx, p.topic, innerX + w1 + 12, y, canvasFont(22, '600'), '#F3F8FD', '#255F8C', '#D8E9F5');
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#93A5B5';
+    ctx.font = canvasFont(24, '500');
+    ctx.fillText('#' + pad(p.id), innerX + innerW, y + 10);
+    ctx.textAlign = 'left';
+
+    y += metaH;
+    ctx.fillStyle = '#33414F';
+    ctx.font = bodyFont;
+    lines.forEach(function (line, i) {
+      ctx.fillText(line, innerX, y + i * lineH);
+    });
+
+    if (truncated) {
+      ctx.fillStyle = '#93A5B5';
+      ctx.font = canvasFont(23, '400');
+      ctx.fillText('…… 全文和全部留言请扫码查看', innerX, y + textH + 6);
+    }
+
+    ctx.strokeStyle = '#EAF1F7';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(innerX, dividerY);
+    ctx.lineTo(innerX + innerW, dividerY);
+    ctx.stroke();
+
+    var qrSize = 200;
+    drawQr(ctx, cardUrl(p.id), innerX, footerTop, qrSize);
+    var rx = innerX + qrSize + 38;
+    var rw = innerW - qrSize - 38;
+    var answers = (p.answers || []).length;
+    ctx.fillStyle = '#1E2A36';
+    ctx.font = canvasFont(28, '700');
+    ctx.fillText(answers ? '扫码看这条留言和全部回复' : '扫码打开这条留言', rx, footerTop + 2);
+    ctx.fillStyle = '#6E8092';
+    ctx.font = canvasFont(21, '400');
+    ctx.fillText(answers ? answers + ' 条西语人留言' : '还没有留言，欢迎来回应', rx, footerTop + 46);
+    var urlText = cardUrl(p.id).replace(/^https?:\/\//, '');
+    ctx.font = canvasFont(17, '400');
+    ctx.fillStyle = '#93A5B5';
+    var urlLines = wrapCanvasText(ctx, urlText, rw).slice(0, 3);
+    urlLines.forEach(function (line, i) {
+      ctx.fillText(line, rx, footerTop + 88 + i * 24);
+    });
+    ctx.fillStyle = '#B0C0CD';
+    ctx.font = canvasFont(17, '500');
+    ctx.fillText('西语树洞 · 公众号「西语SuperO」', rx, footerTop + 88 + urlLines.length * 24 + 10);
+    return canvas;
+  }
 
   function openShare(id) {
     var p = byId[id];
     if (!p) return;
     shareTarget = id;
+    shareFile = null;
     setUrlId(id);
     $('#shareContext').textContent = '#' + pad(id) + ' · ' + p.topic + ' · ' + p.type;
     $('#shareUrl').value = cardUrl(id);
+    var img = $('#shareImage');
+    var err = $('#shareError');
+    var dl = $('#shareDownload');
+    img.hidden = false;
+    err.hidden = true;
+    dl.hidden = true;
+    try {
+      var canvas = renderShareCard(p);
+      var dataUrl = canvas.toDataURL('image/png');
+      img.src = dataUrl;
+      img.alt = '西语树洞 #' + pad(id) + ' 留言分享图';
+      shareFileName = '西语树洞-' + pad(id) + '.png';
+      dl.href = dataUrl;
+      dl.download = shareFileName;
+      dl.hidden = false;
+      if (canvas.toBlob && window.File) {
+        canvas.toBlob(function (blob) {
+          if (!blob) return;
+          try { shareFile = new File([blob], shareFileName, { type: 'image/png' }); } catch (e) {}
+        }, 'image/png');
+      }
+    } catch (e) {
+      img.hidden = true;
+      img.removeAttribute('src');
+      err.hidden = false;
+      dl.hidden = true;
+    }
     $('#shareLead').textContent = IS_WECHAT
-      ? '在微信里打开时，点右上角菜单就能发给朋友；也可以复制链接。'
-      : '复制链接发给朋友，对方打开就能直接看到这条。';
+      ? '长按图片，选「保存图片」或「发送给朋友」；对方扫码就能看到这条。'
+      : '长按图片保存，或点「保存图片」；对方扫码就能看到这条。';
     $('#shareWechat').hidden = !IS_WECHAT;
     $('#shareNative').hidden = !(navigator.share && !IS_WECHAT);
     openModal($('#shareModal'));
@@ -412,14 +670,24 @@
     if (!shareTarget || !navigator.share) return;
     var p = byId[shareTarget];
     if (!p) return;
-    navigator.share({
-      title: '西语树洞 #' + pad(shareTarget),
-      text: excerpt(p.text, 70),
-      url: cardUrl(shareTarget)
-    }).then(function () {
+    var title = '西语树洞 #' + pad(shareTarget);
+    var done = function () {
       closeModal($('#shareModal'));
       setUrlId(null);
-    }).catch(function () {});
+    };
+    var canFiles = false;
+    try {
+      canFiles = !!(shareFile && navigator.canShare && navigator.canShare({ files: [shareFile] }));
+    } catch (e) {}
+    if (canFiles) {
+      navigator.share({ files: [shareFile], title: title }).then(done).catch(function () {});
+      return;
+    }
+    navigator.share({
+      title: title,
+      text: excerpt(p.text, 70),
+      url: cardUrl(shareTarget)
+    }).then(done).catch(function () {});
   }
 
   function copyText(text, btn) {
