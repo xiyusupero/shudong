@@ -492,6 +492,10 @@
     return t + ell;
   }
 
+  function serifFont(size, weight) {
+    return (weight || '700') + ' ' + size + 'px "Songti SC","STSong","Noto Serif CJK SC","Source Han Serif SC",serif';
+  }
+
   function renderShareCard(p) {
     /* 固定 3:4（1080×1440），正文最多 3 行，超出用省略号 */
     var W = 1080;
@@ -504,7 +508,7 @@
     var bodyFont = canvasFont(40, '400');
     var lineH = 68;
     var metaH = 52;
-    var dividerY = 800;
+    var dividerY = 725;
 
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
@@ -550,23 +554,30 @@
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#1E2A36';
-    ctx.font = canvasFont(34, '700');
-    ctx.fillText('西语SuperO', lx + 46, y + 2);
-    var brandW = ctx.measureText('西语SuperO').width;
-    drawPill(ctx, '西语树洞', lx + 46 + brandW + 14, y - 2, canvasFont(18, '700'), '#E7F2FA', '#255F8C', '#CFE3F2');
+    ctx.font = canvasFont(32, '700');
+    ctx.fillText('西语SuperO', lx + 46, y + 4);
     ctx.fillStyle = '#6E8092';
-    ctx.font = canvasFont(21, '400');
+    ctx.font = canvasFont(20, '400');
     ctx.fillText('树洞留言 · 西语人的温馨角落', lx + 46, y + 48);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#93A5B5';
     ctx.font = canvasFont(18, '500');
     ctx.fillText('ESPAÑOL · 树洞', innerX + innerW, y + 16);
+
+    /* 居中栏目标识 */
+    ctx.fillStyle = '#3579AE';
+    roundRect(ctx, W / 2 - 28, 202, 56, 5, 2.5);
+    ctx.fill();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#1E2A36';
+    ctx.font = serifFont(68, '700');
+    ctx.fillText('西语树洞', W / 2, 218);
+    ctx.fillStyle = '#93A5B5';
+    ctx.font = canvasFont(19, '500');
+    ctx.fillText('TREEHOLE  ·  留言分享', W / 2, 306);
     ctx.textAlign = 'left';
 
-    /* 内容块在页眉和分隔线之间垂直居中 */
-    var blockH = metaH + 40 + lines.length * lineH;
-    var contentTop = 220 + Math.max(0, (780 - 220 - blockH) / 2);
-    y = contentTop;
+    y = 352;
     var tc = TYPE_COLORS[p.type] || TYPE_COLORS['倾诉'];
     var w1 = drawPill(ctx, p.type, innerX, y, canvasFont(22, '700'), tc[0], tc[1]);
     drawPill(ctx, p.topic, innerX + w1 + 12, y, canvasFont(22, '600'), '#F3F8FD', '#255F8C', '#D8E9F5');
@@ -576,7 +587,7 @@
     ctx.fillText('#' + pad(p.id), innerX + innerW, y + 10);
     ctx.textAlign = 'left';
 
-    y += metaH + 40;
+    y = 442;
     ctx.fillStyle = '#2C3A47';
     ctx.font = bodyFont;
     lines.forEach(function (line, i) {
@@ -590,15 +601,14 @@
     ctx.lineTo(innerX + innerW, dividerY);
     ctx.stroke();
 
-    /* 底部：二维码 + 网址，不放留言条数 */
     ctx.textAlign = 'center';
     ctx.fillStyle = '#1E2A36';
     ctx.font = canvasFont(30, '700');
-    ctx.fillText('扫码打开这条留言', W / 2, 864);
+    ctx.fillText('扫码打开这条留言', W / 2, 785);
 
-    var qrSize = 320;
+    var qrSize = 360;
     var qrX = (W - qrSize) / 2;
-    var qrY = 910;
+    var qrY = 835;
     drawQr(ctx, cardUrl(p.id), qrX, qrY, qrSize);
 
     var urlText = cardUrl(p.id).replace(/^https?:\/\//, '');
@@ -634,7 +644,7 @@
       shareFileName = '西语树洞-' + pad(id) + '.png';
       dl.href = dataUrl;
       dl.download = shareFileName;
-      dl.hidden = false;
+      dl.hidden = IS_WECHAT;
       if (canvas.toBlob && window.File) {
         canvas.toBlob(function (blob) {
           if (!blob) return;
@@ -648,9 +658,9 @@
       dl.hidden = true;
     }
     $('#shareLead').textContent = IS_WECHAT
-      ? '对方扫码就能看到这条留言。'
-      : '保存图片发给朋友，对方扫码就能看到这条留言。';
-    $('#shareWechat').hidden = !IS_WECHAT;
+      ? '也可以选「发送给朋友」直接转发；右上角 ··· 可分享链接。'
+      : '点「保存图片」下载，或复制链接发给朋友；对方扫码即可打开。';
+    $('#shareLongpress').hidden = !IS_WECHAT;
     $('#shareNative').hidden = !(navigator.share && !IS_WECHAT);
     openModal($('#shareModal'));
   }
