@@ -236,7 +236,7 @@
     html += '<span class="answer-count' + (answers.length ? ' is-zero' : '') + '">' +
       (answers.length ? '' : '还没有留言') + '</span>';
     html += '<span class="card-btns">';
-    html += '<button class="share-btn" data-share="' + p.id + '" aria-label="分享这条留言">分享</button>';
+    html += '<button class="share-btn" data-share="' + p.id + '" aria-label="分享这条留言">📤 分享</button>';
     html += '<button class="respond-btn" data-respond="' + p.id + '">回应这条</button>';
     html += '</span>';
     html += '</div>';
@@ -312,7 +312,7 @@
 
     html += '<div class="detail-actions detail-actions-top">';
     html += '<button class="btn btn-primary btn-small" data-respond="' + p.id + '">回应这条</button>';
-    html += '<button class="btn btn-ghost btn-small" data-share="' + p.id + '">分享这条</button>';
+    html += '<button class="btn btn-ghost btn-small" data-share="' + p.id + '">📤 分享这条</button>';
     html += '<button class="btn btn-ghost btn-small" data-copy="' + p.id + '">复制编号</button>';
     if (p.articleUrl) {
       html += '<a class="btn btn-ghost btn-small" href="' + esc(p.articleUrl) + '" target="_blank" rel="noopener">公众号原文 ↗</a>';
@@ -333,7 +333,7 @@
 
     html += '<div class="detail-actions">';
     html += '<button class="btn btn-primary" data-respond="' + p.id + '">回应这条</button>';
-    html += '<button class="btn btn-ghost" data-share="' + p.id + '">分享这条</button>';
+    html += '<button class="btn btn-ghost" data-share="' + p.id + '">📤 分享这条</button>';
     html += '<button class="btn btn-ghost" data-copy="' + p.id + '">复制编号</button>';
     html += '</div>';
 
@@ -484,44 +484,36 @@
     }
   }
 
+  function fitEllipsis(ctx, line, maxWidth) {
+    var ell = '……';
+    if (ctx.measureText(line + ell).width <= maxWidth) return line + ell;
+    var t = line;
+    while (t.length && ctx.measureText(t + ell).width > maxWidth) t = t.slice(0, -1);
+    return t + ell;
+  }
+
   function renderShareCard(p) {
+    /* 固定 3:4（1080×1440），正文最多 3 行，超出用省略号 */
     var W = 1080;
+    var H = 1440;
     var M = 40;
-    var PAD = 48;
+    var PAD = 56;
     var cardW = W - M * 2;
     var innerX = M + PAD;
     var innerW = cardW - PAD * 2;
-    var headerH = 104;
-    var metaH = 76;
-    var footerH = 220;
+    var bodyFont = canvasFont(40, '400');
+    var lineH = 68;
+    var metaH = 52;
+    var dividerY = 800;
+
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('canvas unavailable');
-
-    /* 文字多时自动缩小字号，尽量一屏放下全文；实在放不下才截断 */
-    var configs = [{ size: 34, lineH: 54, max: 24 }, { size: 30, lineH: 46, max: 34 }];
-    var chosen = null;
-    var lines = null;
-    for (var ci = 0; ci < configs.length; ci++) {
-      ctx.font = canvasFont(configs[ci].size, '400');
-      var testLines = wrapCanvasText(ctx, p.text, innerW);
-      chosen = configs[ci];
-      lines = testLines;
-      if (testLines.length <= configs[ci].max) break;
-    }
-    var truncated = false;
-    if (lines.length > chosen.max) {
-      lines = lines.slice(0, chosen.max);
-      truncated = true;
-      lines[chosen.max - 1] = lines[chosen.max - 1].replace(/[\s，。；、,.;]*$/, '') + '……';
-    }
-    var bodyFont = canvasFont(chosen.size, '400');
-    var lineH = chosen.lineH;
-    var textH = lines.length * lineH;
-    var needH = M * 2 + PAD * 2 + headerH + metaH + textH + (truncated ? 30 : 0) + 80 + footerH;
-    var H = Math.max(820, needH);
-    var footerTop = H - M - PAD - footerH;
-    var dividerY = footerTop - 34;
+    ctx.font = bodyFont;
+    var allLines = wrapCanvasText(ctx, p.text, innerW).filter(function (line) { return line.trim(); });
+    var lines = allLines.slice(0, 3);
+    var truncated = allLines.length > 3;
+    if (truncated) lines[2] = fitEllipsis(ctx, lines[2], innerW);
 
     canvas.width = W;
     canvas.height = H;
@@ -544,32 +536,35 @@
 
     var y = M + PAD;
     var lx = innerX + 24;
-    var ly = y + 24;
+    var ly = y + 26;
     ctx.fillStyle = '#3579AE';
     ctx.beginPath();
-    ctx.arc(lx, ly, 24, 0, Math.PI * 2);
+    ctx.arc(lx, ly, 26, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 3.4;
+    ctx.lineWidth = 3.6;
     ctx.beginPath();
-    ctx.arc(lx, ly, 10, 0, Math.PI * 2);
+    ctx.arc(lx, ly, 11, 0, Math.PI * 2);
     ctx.stroke();
 
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#1E2A36';
-    ctx.font = canvasFont(31, '700');
-    ctx.fillText('西语SuperO', lx + 42, y + 2);
+    ctx.font = canvasFont(34, '700');
+    ctx.fillText('西语SuperO', lx + 46, y + 2);
     ctx.fillStyle = '#6E8092';
-    ctx.font = canvasFont(20, '400');
-    ctx.fillText('树洞留言 · 西语人的温馨角落', lx + 42, y + 44);
+    ctx.font = canvasFont(21, '400');
+    ctx.fillText('树洞留言 · 西语人的温馨角落', lx + 46, y + 48);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#93A5B5';
     ctx.font = canvasFont(18, '500');
-    ctx.fillText('ESPAÑOL · 树洞', innerX + innerW, y + 14);
+    ctx.fillText('ESPAÑOL · 树洞', innerX + innerW, y + 16);
     ctx.textAlign = 'left';
 
-    y += headerH;
+    /* 内容块在页眉和分隔线之间垂直居中 */
+    var blockH = metaH + 40 + lines.length * lineH;
+    var contentTop = 220 + Math.max(0, (780 - 220 - blockH) / 2);
+    y = contentTop;
     var tc = TYPE_COLORS[p.type] || TYPE_COLORS['倾诉'];
     var w1 = drawPill(ctx, p.type, innerX, y, canvasFont(22, '700'), tc[0], tc[1]);
     drawPill(ctx, p.topic, innerX + w1 + 12, y, canvasFont(22, '600'), '#F3F8FD', '#255F8C', '#D8E9F5');
@@ -579,18 +574,12 @@
     ctx.fillText('#' + pad(p.id), innerX + innerW, y + 10);
     ctx.textAlign = 'left';
 
-    y += metaH;
-    ctx.fillStyle = '#33414F';
+    y += metaH + 40;
+    ctx.fillStyle = '#2C3A47';
     ctx.font = bodyFont;
     lines.forEach(function (line, i) {
       ctx.fillText(line, innerX, y + i * lineH);
     });
-
-    if (truncated) {
-      ctx.fillStyle = '#93A5B5';
-      ctx.font = canvasFont(23, '400');
-      ctx.fillText('…… 全文和全部留言请扫码查看', innerX, y + textH + 6);
-    }
 
     ctx.strokeStyle = '#EAF1F7';
     ctx.lineWidth = 2;
@@ -599,27 +588,25 @@
     ctx.lineTo(innerX + innerW, dividerY);
     ctx.stroke();
 
-    var qrSize = 200;
-    drawQr(ctx, cardUrl(p.id), innerX, footerTop, qrSize);
-    var rx = innerX + qrSize + 38;
-    var rw = innerW - qrSize - 38;
-    var answers = (p.answers || []).length;
+    /* 底部：二维码 + 网址，不放留言条数 */
+    ctx.textAlign = 'center';
     ctx.fillStyle = '#1E2A36';
-    ctx.font = canvasFont(28, '700');
-    ctx.fillText(answers ? '扫码看这条留言和全部回复' : '扫码打开这条留言', rx, footerTop + 2);
-    ctx.fillStyle = '#6E8092';
-    ctx.font = canvasFont(21, '400');
-    ctx.fillText(answers ? answers + ' 条西语人留言' : '还没有留言，欢迎来回应', rx, footerTop + 46);
+    ctx.font = canvasFont(30, '700');
+    ctx.fillText('扫码打开这条留言', W / 2, 864);
+
+    var qrSize = 320;
+    var qrX = (W - qrSize) / 2;
+    var qrY = 910;
+    drawQr(ctx, cardUrl(p.id), qrX, qrY, qrSize);
+
     var urlText = cardUrl(p.id).replace(/^https?:\/\//, '');
-    ctx.font = canvasFont(17, '400');
     ctx.fillStyle = '#93A5B5';
-    var urlLines = wrapCanvasText(ctx, urlText, rw).slice(0, 3);
-    urlLines.forEach(function (line, i) {
-      ctx.fillText(line, rx, footerTop + 88 + i * 24);
-    });
+    ctx.font = canvasFont(17, '400');
+    ctx.fillText(urlText, W / 2, qrY + qrSize + 20);
     ctx.fillStyle = '#B0C0CD';
-    ctx.font = canvasFont(17, '500');
-    ctx.fillText('西语树洞 · 公众号「西语SuperO」', rx, footerTop + 88 + urlLines.length * 24 + 10);
+    ctx.font = canvasFont(18, '500');
+    ctx.fillText('西语树洞 · 公众号「西语SuperO」', W / 2, qrY + qrSize + 56);
+    ctx.textAlign = 'left';
     return canvas;
   }
 
