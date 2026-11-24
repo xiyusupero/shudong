@@ -509,16 +509,16 @@
     var bodyFont = canvasFont(40, '400');
     var lineH = 68;
     var metaH = 52;
-    var dividerY = 725;
+    var dividerY = 815;
 
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('canvas unavailable');
     ctx.font = bodyFont;
     var allLines = wrapCanvasText(ctx, p.text, innerW).filter(function (line) { return line.trim(); });
-    var lines = allLines.slice(0, 3);
-    var truncated = allLines.length > 3;
-    if (truncated) lines[2] = fitEllipsis(ctx, lines[2], innerW);
+    var lines = allLines.slice(0, 5);
+    var truncated = allLines.length > 5;
+    if (truncated) lines[4] = fitEllipsis(ctx, lines[4], innerW);
 
     canvas.width = W;
     canvas.height = H;
@@ -588,7 +588,7 @@
     ctx.fillText('#' + pad(p.id), innerX + innerW, y + 10);
     ctx.textAlign = 'left';
 
-    y = 442;
+    y = 430;
     ctx.fillStyle = '#2C3A47';
     ctx.font = bodyFont;
     lines.forEach(function (line, i) {
@@ -605,11 +605,11 @@
     ctx.textAlign = 'center';
     ctx.fillStyle = '#1E2A36';
     ctx.font = canvasFont(30, '700');
-    ctx.fillText('扫码打开这条留言', W / 2, 785);
+    ctx.fillText('扫码打开这条留言', W / 2, 862);
 
-    var qrSize = 360;
+    var qrSize = 320;
     var qrX = (W - qrSize) / 2;
-    var qrY = 835;
+    var qrY = 900;
     drawQr(ctx, cardUrl(p.id), qrX, qrY, qrSize);
 
     var urlText = cardUrl(p.id).replace(/^https?:\/\//, '');
